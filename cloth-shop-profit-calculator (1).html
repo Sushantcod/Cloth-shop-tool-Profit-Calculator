@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cloth Shop Profit Calculator</title>
+<style>
+  :root {
+    --cream: #FAF6EF;
+    --denim: #2B4570;
+    --denim-dark: #1D2F4E;
+    --mustard: #D98E3B;
+    --mustard-dark: #B5722A;
+    --ink: #2B2B2A;
+    --ink-soft: #6B6862;
+    --line: #E3DDCE;
+    --card: #FFFFFF;
+    --success: #3F7A57;
+    --success-bg: #E7F1EA;
+    --danger: #B4483A;
+    --danger-bg: #FBEAE7;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    font-family: 'Segoe UI', 'Inter', Arial, sans-serif;
+    background: var(--cream);
+    color: var(--ink);
+    line-height: 1.5;
+  }
+
+  header {
+    background: var(--denim);
+    color: #fff;
+    padding: 2.25rem 1.5rem 3.5rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  header::after {
+    content: "";
+    position: absolute;
+    right: -40px;
+    top: -40px;
+    width: 180px;
+    height: 180px;
+    border: 2px dashed rgba(255,255,255,0.15);
+    border-radius: 50%;
+  }
+
+  .header-inner {
+    max-width: 900px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+  }
+
+  .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--mustard);
+    font-weight: 700;
+    margin-bottom: 10px;
+  }
+
+  h1 {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: clamp(28px, 4vw, 38px);
+    margin: 0 0 8px;
+    font-weight: 700;
+  }
+
+  header p {
+    margin: 0;
+    color: rgba(255,255,255,0.78);
+    font-size: 15px;
+    max-width: 560px;
+  }
+
+  main {
+    max-width: 900px;
+    margin: -2.25rem auto 3rem;
+    padding: 0 1.5rem;
+    position: relative;
+    z-index: 2;
+  }
+
+  .panel {
+    background: var(--card);
+    border-radius: 14px;
+    border: 1px solid var(--line);
+    box-shadow: 0 8px 24px rgba(43,69,112,0.08);
+    padding: 1.75rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .panel-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+  }
+
+  .panel-title h2 {
+    font-size: 16px;
+    margin: 0;
+    color: var(--denim-dark);
+    font-weight: 700;
+  }
+
+  .panel-title span.tag {
+    font-size: 11px;
+    color: var(--ink-soft);
+    background: var(--cream);
+    border: 1px solid var(--line);
+    padding: 3px 10px;
+    border-radius: 20px;
+  }
+
+  #add-row {
+    background: var(--mustard);
+    color: #fff;
+    border: none;
+    padding: 9px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: background 0.15s;
+  }
+  #add-row:hover { background: var(--mustard-dark); }
+
+  .row-headers {
+    display: grid;
+    grid-template-columns: 1.6fr 1fr 1fr 0.7fr 1fr 34px;
+    gap: 10px;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--ink-soft);
+    padding: 0 2px 8px;
+    border-bottom: 1px solid var(--line);
+    margin-bottom: 10px;
+  }
+
+  .item-row {
+    display: grid;
+    grid-template-columns: 1.6fr 1fr 1fr 0.7fr 1fr 34px;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+
+  input[type="text"], input[type="number"] {
+    width: 100%;
+    padding: 9px 10px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    font-size: 14px;
+    color: var(--ink);
+    background: #fff;
+    font-family: inherit;
+  }
+  input:focus {
+    outline: none;
+    border-color: var(--denim);
+    box-shadow: 0 0 0 3px rgba(43,69,112,0.12);
+  }
+
+  .item-profit {
+    font-size: 13px;
+    font-weight: 600;
+    text-align: right;
+    color: var(--ink-soft);
+  }
+
+  .remove-btn {
+    background: none;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    color: var(--danger);
+    width: 34px;
+    height: 34px;
+    cursor: pointer;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+  }
+  .remove-btn:hover { background: var(--danger-bg); }
+
+  .expense-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 14px;
+  }
+
+  .field label {
+    display: block;
+    font-size: 12px;
+    color: var(--ink-soft);
+    margin-bottom: 5px;
+    font-weight: 600;
+  }
+
+  .summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 14px;
+  }
+
+  .metric {
+    background: var(--cream);
+    border-radius: 10px;
+    padding: 1rem 1.1rem;
+    border: 1px solid var(--line);
+  }
+
+  .metric .label {
+    font-size: 12px;
+    color: var(--ink-soft);
+    margin: 0 0 6px;
+    font-weight: 600;
+  }
+
+  .metric .value {
+    font-size: 22px;
+    font-weight: 700;
+    margin: 0;
+    color: var(--denim-dark);
+  }
+
+  .metric.net.positive .value { color: var(--success); }
+  .metric.net.negative .value { color: var(--danger); }
+
+  .metric.net.positive { background: var(--success-bg); border-color: #cfe4d7; }
+  .metric.net.negative { background: var(--danger-bg); border-color: #f0d3cd; }
+
+  footer {
+    text-align: center;
+    color: var(--ink-soft);
+    font-size: 12px;
+    padding: 1rem 1.5rem 2rem;
+  }
+
+  @media (max-width: 640px) {
+    .row-headers { display: none; }
+    .item-row {
+      grid-template-columns: 1fr 1fr;
+      grid-template-areas:
+        "name name"
+        "buy sell"
+        "qty profit"
+        "remove remove";
+      background: var(--cream);
+      border-radius: 10px;
+      padding: 10px;
+      border: 1px solid var(--line);
+    }
+    .item-row input.f-name { grid-area: name; }
+    .item-row input.f-buy { grid-area: buy; }
+    .item-row input.f-sell { grid-area: sell; }
+    .item-row input.f-qty { grid-area: qty; }
+    .item-row .item-profit { grid-area: profit; text-align: left; }
+    .item-row .remove-btn { grid-area: remove; width: 100%; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="eyebrow">Cloth shop tool</div>
+    <h1>Profit Calculator</h1>
+    <p>Enter your buy price, sell price and quantity for each item, add your monthly expenses, and see your profit and breakeven instantly.</p>
+  </div>
+</header>
+
+<main>
+  <div class="panel">
+    <div class="panel-title">
+      <h2>Items</h2>
+      <button id="add-row">+ Add item</button>
+    </div>
+    <div class="row-headers">
+      <span>Item</span><span>Buy price</span><span>Sell price</span><span>Qty</span><span>Profit</span><span></span>
+    </div>
+    <div id="rows"></div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-title">
+      <h2>Investment</h2>
+      <span class="tag">One-time</span>
+    </div>
+    <div class="expense-grid">
+      <div class="field">
+        <label for="inv-stock">Stock purchase</label>
+        <input type="number" id="inv-stock" min="0" value="150000">
+      </div>
+      <div class="field">
+        <label for="inv-setup">Shop setup / interior</label>
+        <input type="number" id="inv-setup" min="0" value="50000">
+      </div>
+      <div class="field">
+        <label for="inv-other">Other investment</label>
+        <input type="number" id="inv-other" min="0" value="0">
+      </div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-title">
+      <h2>Monthly expenses</h2>
+      <span class="tag">All fields optional</span>
+    </div>
+    <div class="expense-grid">
+      <div class="field">
+        <label for="exp-rent">Rent</label>
+        <input type="number" id="exp-rent" min="0" value="20000">
+      </div>
+      <div class="field">
+        <label for="exp-staff">Staff cost</label>
+        <input type="number" id="exp-staff" min="0" value="10000">
+      </div>
+      <div class="field">
+        <label for="exp-electricity">Electricity</label>
+        <input type="number" id="exp-electricity" min="0" value="3000">
+      </div>
+      <div class="field">
+        <label for="exp-other">Other expense</label>
+        <input type="number" id="exp-other" min="0" value="2000">
+      </div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-title">
+      <h2>Summary</h2>
+    </div>
+    <div class="summary-grid">
+      <div class="metric">
+        <p class="label">Total buy price</p>
+        <p class="value" id="out-total-buy">₹0</p>
+      </div>
+      <div class="metric">
+        <p class="label">Total sell price</p>
+        <p class="value" id="out-total-sell">₹0</p>
+      </div>
+      <div class="metric">
+        <p class="label">Sales profit</p>
+        <p class="value" id="out-sales-profit">₹0</p>
+      </div>
+      <div class="metric">
+        <p class="label">Total expenses</p>
+        <p class="value" id="out-expenses">₹0</p>
+      </div>
+      <div class="metric net" id="net-card">
+        <p class="label">Net profit / month</p>
+        <p class="value" id="out-net">₹0</p>
+      </div>
+      <div class="metric">
+        <p class="label">Breakeven pieces / month</p>
+        <p class="value" id="out-breakeven">0</p>
+      </div>
+      <div class="metric">
+        <p class="label">Total investment</p>
+        <p class="value" id="out-investment">₹0</p>
+      </div>
+      <div class="metric">
+        <p class="label">Payback period</p>
+        <p class="value" id="out-payback">&mdash;</p>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer>Made for your cloth shop &mdash; edit the numbers above anytime.</footer>
+
+<script>
+const rowsEl = document.getElementById('rows');
+let rowCount = 0;
+
+function makeRow(name, buy, sell, qty) {
+  rowCount++;
+  const row = document.createElement('div');
+  row.className = 'item-row';
+  row.dataset.id = rowCount;
+  row.innerHTML =
+    '<input type="text" class="f-name" placeholder="Item name" value="' + name + '">' +
+    '<input type="number" class="f-buy" placeholder="Buy price" min="0" value="' + buy + '">' +
+    '<input type="number" class="f-sell" placeholder="Sell price" min="0" value="' + sell + '">' +
+    '<input type="number" class="f-qty" placeholder="Qty" min="0" value="' + qty + '">' +
+    '<span class="item-profit">₹0</span>' +
+    '<button class="remove-btn" aria-label="Remove item">&times;</button>';
+  rowsEl.appendChild(row);
+  row.querySelectorAll('input').forEach(inp => inp.addEventListener('input', recalc));
+  row.querySelector('.remove-btn').addEventListener('click', () => { row.remove(); recalc(); });
+}
+
+document.getElementById('add-row').addEventListener('click', () => makeRow('', '', '', 1));
+
+function fmt(n) {
+  return '₹' + Math.round(n).toLocaleString('en-IN');
+}
+
+function recalc() {
+  let salesProfit = 0;
+  let totalQty = 0;
+  let totalBuy = 0;
+  let totalSell = 0;
+  rowsEl.querySelectorAll('.item-row').forEach(row => {
+    const buy = parseFloat(row.querySelector('.f-buy').value) || 0;
+    const sell = parseFloat(row.querySelector('.f-sell').value) || 0;
+    const qty = parseFloat(row.querySelector('.f-qty').value) || 0;
+    const profit = (sell - buy) * qty;
+    row.querySelector('.item-profit').textContent = fmt(profit);
+    salesProfit += profit;
+    totalQty += qty;
+    totalBuy += buy * qty;
+    totalSell += sell * qty;
+  });
+
+  const rent = parseFloat(document.getElementById('exp-rent').value) || 0;
+  const staff = parseFloat(document.getElementById('exp-staff').value) || 0;
+  const elec = parseFloat(document.getElementById('exp-electricity').value) || 0;
+  const other = parseFloat(document.getElementById('exp-other').value) || 0;
+  const totalExpenses = rent + staff + elec + other;
+  const netProfit = salesProfit - totalExpenses;
+  const avgProfitPerPiece = totalQty > 0 ? salesProfit / totalQty : 0;
+  const breakeven = avgProfitPerPiece > 0 ? Math.ceil(totalExpenses / avgProfitPerPiece) : 0;
+
+  const invStock = parseFloat(document.getElementById('inv-stock').value) || 0;
+  const invSetup = parseFloat(document.getElementById('inv-setup').value) || 0;
+  const invOther = parseFloat(document.getElementById('inv-other').value) || 0;
+  const totalInvestment = invStock + invSetup + invOther;
+  const paybackMonths = netProfit > 0 ? (totalInvestment / netProfit) : null;
+
+  document.getElementById('out-total-buy').textContent = fmt(totalBuy);
+  document.getElementById('out-total-sell').textContent = fmt(totalSell);
+  document.getElementById('out-sales-profit').textContent = fmt(salesProfit);
+  document.getElementById('out-expenses').textContent = fmt(totalExpenses);
+  document.getElementById('out-net').textContent = (netProfit < 0 ? '-' : '') + fmt(Math.abs(netProfit));
+  document.getElementById('out-breakeven').textContent = breakeven.toLocaleString('en-IN');
+  document.getElementById('out-investment').textContent = fmt(totalInvestment);
+  document.getElementById('out-payback').textContent = paybackMonths !== null
+    ? (Math.round(paybackMonths * 10) / 10) + ' months'
+    : '\u2014';
+
+  const netCard = document.getElementById('net-card');
+  netCard.classList.remove('positive', 'negative');
+  netCard.classList.add(netProfit < 0 ? 'negative' : 'positive');
+}
+
+['exp-rent', 'exp-staff', 'exp-electricity', 'exp-other', 'inv-stock', 'inv-setup', 'inv-other'].forEach(id => {
+  document.getElementById(id).addEventListener('input', recalc);
+});
+
+makeRow('Shirt (medium)', 300, 550, 40);
+makeRow('T-shirt (medium)', 300, 550, 30);
+makeRow('Pant / Jeans (medium)', 500, 850, 25);
+makeRow('Shirt (high)', 900, 1600, 8);
+
+recalc();
+</script>
+
+</body>
+</html>
